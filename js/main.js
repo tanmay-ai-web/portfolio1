@@ -107,7 +107,7 @@ if(m<=2||c<=2||s)document.documentElement.classList.add('lite');})();
 /* ==================== Next Module ==================== */
 
 
-const COLOUR_SRC = "assets/graphic-4.webp";   // revealed under the cursor
+const COLOUR_SRC = "assets/hero-portrait.webp";   // revealed under the cursor
 const $ = (s, r = document) => r.querySelector(s);
 const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
 const canHover = matchMedia('(hover: hover) and (pointer: fine)').matches;
