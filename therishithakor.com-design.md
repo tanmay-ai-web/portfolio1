@@ -1,6 +1,6 @@
 ---
 version: alpha
-name: Rishi Thakor Personal Portfolio
+name: Tanmay Jain Personal Portfolio
 description: A warm, minimal personal portfolio system with editorial typography and soft monochrome contrast.
 colors:
   primary: "#1a1818"
@@ -147,7 +147,7 @@ components:
     padding: "12px 16px"
 ---
 
-# Rishi Thakor Personal Portfolio
+# Tanmay Jain Personal Portfolio
 
 ## Overview
 This system feels intimate, polished, and quietly confident, with a soft editorial mood rather than a loud marketing voice. It suits a personal portfolio for a freelancer or creative technologist who wants to feel approachable but still highly professional. The page is spacious, calm, and centered around a strong hero presentation with subtle warmth in the background and accents.

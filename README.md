@@ -1,6 +1,6 @@
-# Rishi Thakor — Official Personal Portfolio (1:1 Exact Replica)
+# Tanmay Jain — Official Personal Portfolio (1:1 Exact Replica)
 
-This project contains the **exact 1:1 replica of [therishithakor.com](https://therishithakor.com/)**, complete with all interactive 3D elements, animations, fonts, and assets.
+This project contains the **exact 1:1 replica of [thetanmayjain.com](https://thetanmayjain.com/)**, complete with all interactive 3D elements, animations, fonts, and assets.
 
 ---
 
@@ -16,7 +16,7 @@ This project contains the **exact 1:1 replica of [therishithakor.com](https://th
 
 3. **Full Hero Section**:
    - Eyebrow with real-time status.
-   - **Interactive 3D Desk Flip-Calendar** (`#cal`) that flips through Rishi's skills page-by-page.
+   - **Interactive 3D Desk Flip-Calendar** (`#cal`) that flips through Tanmay's skills page-by-page.
    - Cutout portrait photo anchored right against the status hairline.
    - **Interactive 3D Holographic Ability Card** (`#holo`): Click `"My ability card"` on the portrait to open a floating 3D card with real parallax depth, foil reflections, sheen, glare, and 3D card tilt/flip!
 
@@ -27,7 +27,7 @@ This project contains the **exact 1:1 replica of [therishithakor.com](https://th
 5. **"My Story" — Time Machine Timeline**:
    - A continuous interactive rail where a dot travels as you scroll.
    - Flipping digital digit counter showing the years (2024, 2023, 2022, 2021).
-   - Chapters covering Rishi's career from PDEU degree through Quicko, Himspring, and Freelance.
+   - Chapters covering Tanmay's career from PDEU degree through Quicko, Himspring, and Freelance.
 
 6. **Interactive Multi-Step Project Questionnaire**:
    - Interactive modal questionnaire with step progress, project requirements, budget sliders, and direct contact.
