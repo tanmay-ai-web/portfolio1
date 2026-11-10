@@ -1427,7 +1427,7 @@ if (['#works', '#about', '#contact'].includes(location.hash)){
   // the ThreeUI card is the card, on every device. It may take a moment to load, and it is allowed to.
   // The layered CSS card below is kept for one case only: a browser with no WebGL at all, or an engine that fails outright.
   const hasGL = (() => { try { const c = document.createElement('canvas'); return !!(c.getContext('webgl2') || c.getContext('webgl')); } catch (e) { return false; } })();
-  let frame = null, back = null, timer = 0, isOpen = false, useLite = !hasGL, liteReady = null, openT = 0, handing = false;
+  let frame = null, back = null, timer = 0, isOpen = false, useLite = true, liteReady = null, openT = 0, handing = false;
   const progress = p => { ld.style.setProperty('--p', p); pct.textContent = Math.round(p * 100) + '%'; };
   // the light card's faces, decoded before it is shown so it never appears half-drawn
   // the faces are marked lazy so their weight never lands on a visit that gets the 3D card;
