@@ -1,4 +1,4 @@
-try{if(localStorage.getItem('rishi-mode')==='dark'){document.documentElement.dataset.mode='dark';document.querySelector('meta[name=theme-color]')}}catch(e){}
+try{if(localStorage.getItem('tanmay-mode')==='dark'){document.documentElement.dataset.mode='dark';document.querySelector('meta[name=theme-color]')}}catch(e){}
 
 /* ==================== Next Module ==================== */
 
@@ -10,7 +10,7 @@ if(m<=2||c<=2||s)document.documentElement.classList.add('lite');})();
 
 /* ==================== Next Module ==================== */
 
-{"@context":"https://schema.org","@graph":[{"@type":"Person","@id":"https://therishithakor.com/#rishi","name":"Rishi Thakor","url":"https://therishithakor.com","jobTitle":"Freelance Developer, Designer and Photographer","image":"https://therishithakor.com/og.jpg?v=2","description":"Freelance web and iOS developer, UI/UX designer, graphic designer and photographer working remotely with clients worldwide.","knowsAbout":["Web development","iOS app development","UI/UX design","Graphic design","Brand identity","Photography"],"address":{"@type":"PostalAddress","addressCountry":"IN"},"knowsLanguage":["en"],"worksFor":{"@id":"https://therishithakor.com/#org"}},{"@type":"Organization","@id":"https://therishithakor.com/#org","name":"Rishi Thakor — Design & Development","alternateName":"Rishi Thakor","url":"https://therishithakor.com","image":"https://therishithakor.com/og.jpg?v=2","logo":{"@type":"ImageObject","url":"https://therishithakor.com/icon-512.png","width":512,"height":512},"founder":{"@id":"https://therishithakor.com/#rishi"},"email":"rishithakor218@gmail.com","contactPoint":{"@type":"ContactPoint","contactType":"sales","email":"rishithakor218@gmail.com","availableLanguage":"en","areaServed":["US","GB","CA","AU"]},"description":"Freelance web development, iOS app development, UI/UX design and graphic design, delivered remotely.","areaServed":[{"@type":"Country","name":"United States"},{"@type":"Country","name":"United Kingdom"},{"@type":"Country","name":"Canada"},{"@type":"Country","name":"Australia"},"Worldwide"],"hasOfferCatalog":{"@type":"OfferCatalog","name":"Services","itemListElement":[{"@type":"Offer","itemOffered":{"@type":"Service","name":"Web development","description":"Websites and web applications designed and built end to end."}},{"@type":"Offer","itemOffered":{"@type":"Service","name":"iOS app development","description":"Native iOS apps and games, from first sketch to the App Store."}},{"@type":"Offer","itemOffered":{"@type":"Service","name":"UI/UX design","description":"Product and interface design: user flows, wireframes and finished UI."}},{"@type":"Offer","itemOffered":{"@type":"Service","name":"Graphic design","description":"Brand identity, social media creatives, posters and logos."}},{"@type":"Offer","itemOffered":{"@type":"Service","name":"Photography","description":"Portrait, event and street photography."}}]}},{"@type":"WebSite","@id":"https://therishithakor.com/#site","url":"https://therishithakor.com","name":"Rishi Thakor — Portfolio","publisher":{"@id":"https://therishithakor.com/#rishi"},"inLanguage":"en"}]}
+{"@context":"https://schema.org","@graph":[{"@type":"Person","@id":"https://github.com/tanmay-ai-web/portfolio1/#tanmay","name":"Tanmay Jain","url":"https://github.com/tanmay-ai-web/portfolio1","jobTitle":"Freelance Developer, Designer and Photographer","image":"https://github.com/tanmay-ai-web/portfolio1/og.jpg?v=2","description":"Freelance web and iOS developer, UI/UX designer, graphic designer and photographer working remotely with clients worldwide.","knowsAbout":["Web development","iOS app development","UI/UX design","Graphic design","Brand identity","Photography"],"address":{"@type":"PostalAddress","addressCountry":"IN"},"knowsLanguage":["en"],"worksFor":{"@id":"https://github.com/tanmay-ai-web/portfolio1/#org"}},{"@type":"Organization","@id":"https://github.com/tanmay-ai-web/portfolio1/#org","name":"Tanmay Jain — Design & Development","alternateName":"Tanmay Jain","url":"https://github.com/tanmay-ai-web/portfolio1","image":"https://github.com/tanmay-ai-web/portfolio1/og.jpg?v=2","logo":{"@type":"ImageObject","url":"https://github.com/tanmay-ai-web/portfolio1/icon-512.png","width":512,"height":512},"founder":{"@id":"https://github.com/tanmay-ai-web/portfolio1/#tanmay"},"email":"incredibletanmay@outlook.com","contactPoint":{"@type":"ContactPoint","contactType":"sales","email":"incredibletanmay@outlook.com","availableLanguage":"en","areaServed":["US","GB","CA","AU"]},"description":"Freelance web development, iOS app development, UI/UX design and graphic design, delivered remotely.","areaServed":[{"@type":"Country","name":"United States"},{"@type":"Country","name":"United Kingdom"},{"@type":"Country","name":"Canada"},{"@type":"Country","name":"Australia"},"Worldwide"],"hasOfferCatalog":{"@type":"OfferCatalog","name":"Services","itemListElement":[{"@type":"Offer","itemOffered":{"@type":"Service","name":"Web development","description":"Websites and web applications designed and built end to end."}},{"@type":"Offer","itemOffered":{"@type":"Service","name":"iOS app development","description":"Native iOS apps and games, from first sketch to the App Store."}},{"@type":"Offer","itemOffered":{"@type":"Service","name":"UI/UX design","description":"Product and interface design: user flows, wireframes and finished UI."}},{"@type":"Offer","itemOffered":{"@type":"Service","name":"Graphic design","description":"Brand identity, social media creatives, posters and logos."}},{"@type":"Offer","itemOffered":{"@type":"Service","name":"Photography","description":"Portrait, event and street photography."}}]}},{"@type":"WebSite","@id":"https://github.com/tanmay-ai-web/portfolio1/#site","url":"https://github.com/tanmay-ai-web/portfolio1","name":"Tanmay Jain — Portfolio","publisher":{"@id":"https://github.com/tanmay-ai-web/portfolio1/#tanmay"},"inLanguage":"en"}]}
 
 /* ==================== Next Module ==================== */
 
@@ -238,7 +238,7 @@ $('#navList').addEventListener('click', e => {
 });
 $('#navStart').addEventListener('click', () => closeNav(() => openModal()));
 // request modal
-const CONTACT_EMAIL = ['rishithakor218', 'gmail.com'].join('@');   // where project requests go (assembled here so address-harvesting bots don't find it in the page)
+const CONTACT_EMAIL = ['incredibletanmay', 'outlook.com'].join('@');   // where project requests go (assembled here so address-harvesting bots don't find it in the page)
 document.querySelectorAll('[data-mail]').forEach(a => { a.href = 'mailto:' + CONTACT_EMAIL; a.textContent = CONTACT_EMAIL; });
 const modal = $('#modal'), form = $('#reqForm');
 let lastFocus = null;
@@ -258,7 +258,7 @@ $('#mPanel').addEventListener('click', e => e.stopPropagation());
 $('#mClose').addEventListener('click', closeModal);
 $('#mDone').addEventListener('click', closeModal);
 // the form sends for real only on the live website (Netlify receives it); anywhere else it opens an email
-const FORM_LIVE = /(^|\.)therishithakor\.com$|\.netlify\.app$/.test(location.hostname);
+const FORM_LIVE = /(^|\.)github\.io$|\.netlify\.app$|localhost$/.test(location.hostname);
 const SEND_LABEL = FORM_LIVE ? 'Send enquiry' : 'Write the email';
 
 // ── the questionnaire: one question at a time; only paid projects at or above the minimum get through ──
@@ -345,7 +345,7 @@ form.addEventListener('submit', e => {
   $('#f-subject').value = `[${grade}] ${g('service')} · ${budget} · ${g('name')}`;
   const d = new FormData(form), name = g('name'), mail = g('email'), phone = g('phone'), proj = g('project');
   const subject = $('#f-subject').value;
-  const body = `Hi Rishi,\n\n${proj}\n\nService: ${g('service')}\nBudget: ${budget}\nStart: ${g('timeline')}\nFor: ${g('client_type')}${g('website') ? '\nCompany: ' + g('website') : ''}\n\n— ${name}\n${mail}\n${phone}`;
+  const body = `Hi Tanmay,\n\n${proj}\n\nService: ${g('service')}\nBudget: ${budget}\nStart: ${g('timeline')}\nFor: ${g('client_type')}${g('website') ? '\nCompany: ' + g('website') : ''}\n\n— ${name}\n${mail}\n${phone}`;
   const viaMail = () => {
     location.href = `mailto:${CONTACT_EMAIL}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
     $('#mOkT').textContent = 'Almost there';
@@ -380,7 +380,7 @@ bindHovers();
 
 /* ---------- Flip calendar: skills on an endless desk-calendar flip ---------- */
 (function flipCalendar(){
-  const SKILLS = ['Web Developer', 'App Developer', 'UI/UX Designer', 'Graphic Designer', 'Photographer'];
+  const SKILLS = ['Full-Stack Developer', 'Photographer', 'UI/UX Designer', 'Graphic Designer'];
   const HOLD = 1700, FLIP = 1250;
   const cal = $('#cal'); if (!cal) return;
   const body = $('.cal__body', cal), leaf = $('.cal__leaf', cal);
@@ -546,7 +546,7 @@ if (matchMedia('(max-width: 1023.98px), (hover: none)').matches){
 } else liquidReveal($('#fig'), $('#figCanvas'), COLOUR_SRC);
 
 /* ---------- Mode (light / dark) ---------- */
-const MODE_KEY = 'rishi-mode';
+const MODE_KEY = 'tanmay-mode';
 const themeMeta = document.querySelector('meta[name="theme-color"]');
 let modeAnimT = 0;
 function getMode(){ return root.dataset.mode === 'dark' ? 'dark' : 'light'; }
@@ -1254,7 +1254,7 @@ const toggleMode = () => setMode(getMode() === 'dark' ? 'light' : 'dark');
           inWall = true;
           wallv.classList.add('live');
           try { history.pushState({ wall: 1 }, '', ROUTES[i]); pushed = true; } catch (e) { pushed = false; }
-          document.title = TITLES[i] + ' — Rishi';
+          document.title = TITLES[i] + ' — Tanmay';
           toWall({ wall: 'enter' });
           try { frame.contentWindow.focus(); } catch (e) {}
         }, 0);
@@ -1462,7 +1462,7 @@ if (['#works', '#about', '#contact'].includes(location.hash)){
     requestAnimationFrame(() => layer.classList.add('on'));
     if (useLite){ showLite(); return; }
     frame = document.createElement('iframe');
-    frame.title = "Rishi Thakor's ability card";
+    frame.title = "Tanmay Jain's ability card";
     frame.setAttribute('sandbox', 'allow-scripts');   // the claude.ai viewer only loads its own files into a same-origin frame
     frame.loading = 'eager';
     if (window.__ONEFILE && window.__ONEFILE.holo) frame.srcdoc = window.__ONEFILE.holo; else frame.src = SRC;
@@ -1669,7 +1669,7 @@ try {
 
 
 (() => {
-  const ID = 'G-12PNLHKGHK', K = 'rishi-analytics';
+  const ID = '', K = 'tanmay-analytics';
   let v = null; try { v = localStorage.getItem(K); } catch (e) {}
   const load = () => {
     window.dataLayer = window.dataLayer || [];
