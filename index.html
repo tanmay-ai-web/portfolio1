@@ -95,6 +95,7 @@ body.ready .line>span{transform:none;opacity:1}
 
 /* ---------- loader: the doors' colours stack up, one per discipline, then slides away to open the page ---------- */
 .loader{position:fixed;inset:0;z-index:120;overflow:hidden;color:#E8E4E0;--p:0;font-family:'Onest',ui-sans-serif,system-ui,-apple-system,'Segoe UI',sans-serif}
+.loader.out{pointer-events:none}
 .ld__bg{position:absolute;inset:0;background:radial-gradient(38% 55% at 0% 72%,rgba(164,85,44,.26),transparent 70%),radial-gradient(40% 58% at 100% 70%,rgba(196,176,176,.16),transparent 72%),
   radial-gradient(70% 60% at 50% 0%,rgba(107,92,92,.3),transparent 70%),#0D0C0C;transition:transform .85s cubic-bezier(.76,0,.24,1)}
 .loader.out .ld__bg{transform:translateY(-100%)}
@@ -934,7 +935,7 @@ body{margin:0}
 @media (max-width:767.98px){.totop{width:3rem;height:3rem}}
 @media (prefers-reduced-motion:reduce){.totop,.totop svg.ar{transition:opacity .2s ease,visibility 0s linear .2s}}
 </style>
-<script>try{if(localStorage.getItem('tanmay-mode')==='dark'){document.documentElement.dataset.mode='dark';document.querySelector('meta[name=theme-color]')}}catch(e){}</script>
+<script>try{if(localStorage.getItem('tanmay-mode')==='dark'){document.documentElement.dataset.mode='dark';var tm=document.querySelector('meta[name=theme-color]');if(tm)tm.setAttribute('content','#1A1818');}}catch(e){}</script>
 <script>
 /* modest devices get the same site with the heaviest per-frame effects eased off */
 (function(){var n=navigator,m=n.deviceMemory||8,c=n.hardwareConcurrency||8,s=n.connection&&n.connection.saveData;
@@ -988,6 +989,73 @@ if(m<=2||c<=2||s)document.documentElement.classList.add('lite');})();
     </div>
   </div>
 </div>
+<script>
+/* Independent fail-safe: ensures preloader transitions out and is removed within 2.5s even if module JS fails */
+(function () {
+  var hash = location.hash;
+  if (hash === '#works' || hash === '#about' || hash === '#contact') {
+    var quick = document.getElementById('loader');
+    if (quick) try { quick.remove(); } catch (e) {}
+    window.__introOut = true;
+    window.__introDone = true;
+    return;
+  }
+  window.__introDone = window.__introDone || false;
+  window.__introOut = window.__introOut || false;
+  window.__introDispatched = window.__introDispatched || false;
+  function unlockScroll() {
+    try {
+      var r = document.documentElement;
+      r.style.removeProperty('position');
+      r.style.removeProperty('overflow');
+      r.style.removeProperty('height');
+      if (typeof window.__introUnlock === 'function') window.__introUnlock();
+    } catch (e) {}
+  }
+  function dispatchReady() {
+    if (window.__introDispatched) return;
+    window.__introDispatched = true;
+    try { window.dispatchEvent(new Event('intro:ready')); } catch (e) {}
+  }
+  function startExitTransition() {
+    if (window.__introOut || window.__introDone) return;
+    window.__introOut = true;
+    var el = document.getElementById('loader');
+    if (el) {
+      el.style.pointerEvents = 'none';
+      el.style.setProperty('--p', '1');
+      var cnt = document.getElementById('ldCount');
+      if (cnt) cnt.textContent = '100';
+      var pills = el.querySelectorAll('.ld__pill');
+      for (var i = 0; i < pills.length; i++) pills[i].classList.add('on');
+      el.classList.add('out');
+    }
+    setTimeout(function () {
+      if (document.body) document.body.classList.add('ready');
+    }, 180);
+  }
+  function killPreloader() {
+    if (window.__introDone) return;
+    if (!window.__introOut) startExitTransition();
+    window.__introDone = true;
+    var el = document.getElementById('loader');
+    if (el) {
+      el.style.pointerEvents = 'none';
+      try { el.remove(); } catch (e) { el.style.display = 'none'; }
+    }
+    if (document.body) document.body.classList.add('ready');
+    unlockScroll();
+    dispatchReady();
+  }
+  window.__introKill = killPreloader;
+  // If module JS failed or stalled before starting the exit transition, run the existing exit transition at 1.65s
+  setTimeout(function () {
+    if (!window.__introDone && !window.__introOut) startExitTransition();
+  }, 1650);
+  // Hard deadline at 2.5s: remove the preloader, reveal the home page, and restore scrolling
+  setTimeout(killPreloader, 2500);
+})();
+</script>
 
 <!-- ============ Header ============ -->
 <header class="hdr rv">
@@ -1353,7 +1421,7 @@ if(m<=2||c<=2||s)document.documentElement.classList.add('lite');})();
     else (el.requestFullscreen || el.webkitRequestFullscreen)?.call(el)?.catch?.(() => {});
   };
   addEventListener('keydown', e => {
-    if ((e.key !== 'f' && e.key !== 'F') || e.metaKey || e.ctrlKey || e.altKey || typing(e)) return;
+    if ((e.key !== 'f' && e.key !== 'F') || e.metaKey || e.ctrlKey || e.altKey || e.shiftKey || typing(e)) return;
     e.preventDefault();
     if (window.top !== window) { try { parent.postMessage({ wall: 'fullscreen' }, location.origin === 'null' ? '*' : location.origin); } catch (_) {} return; }
     toggle();
@@ -1523,6 +1591,7 @@ const COARSE = matchMedia('(pointer: coarse)').matches;
 window.__snapTo = top => { if (!COARSE && window.__lenis) window.__lenis.scrollTo(top, { duration: .6, easing: x => 1 - Math.pow(1 - x, 3) }); else scrollTo({ top, behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' }); };
 function stopScroll(){ locks++; scrollEnabled = false; lenis?.stop(); Object.assign(root.style, { position:'relative', overflow:'hidden', height:'100%' }); }
 function startScroll(){ locks = Math.max(0, locks - 1); if (locks) return; scrollEnabled = true; lenis?.start(); root.style.removeProperty('position'); root.style.removeProperty('overflow'); root.style.removeProperty('height'); }
+window.__introUnlock = () => { locks = 0; scrollEnabled = true; lenis?.start(); root.style.removeProperty('position'); root.style.removeProperty('overflow'); root.style.removeProperty('height'); };
 function scrollToId(id){
   const el = document.getElementById(id); if (!el) return;
   scrollEnabled = false;
@@ -1572,7 +1641,7 @@ function bindHovers(scope = document){
 
 
 /* ---------- sticky header: gets a soft backing once the page scrolls ---------- */
-{ const hdr = $('.hdr'); const upd = () => hdr.classList.toggle('stuck', scrollY > 24); addEventListener('scroll', upd, { passive: true }); upd(); }
+{ const hdr = $('.hdr'); if (hdr) { const upd = () => hdr.classList.toggle('stuck', scrollY > 24); addEventListener('scroll', upd, { passive: true }); upd(); } }
 /* ---------- live clock ---------- */
 const MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December'];
 function tickClock(){
@@ -1779,6 +1848,7 @@ bindHovers();
   const body = $('.cal__body', cal), leaf = $('.cal__leaf', cal);
   const under = $('[data-under]', cal), face = $('.cal__face', cal);
   const measure = $('.cal__measure', cal), rings = $('.cal__rings', cal);
+  if (!body || !leaf || !under || !face || !measure || !rings) return;
   const n = SKILLS.length;
   let i = 0, timer = 0, flipping = false, started = false;
 
@@ -1848,9 +1918,11 @@ bindHovers();
    (added with 'lighter'), so semi-transparent hair edges keep exactly the same opacity
    instead of doubling up where the colour layer sits on the B&W one. */
 function liquidReveal(stage, canvas, afterSrc, { brushRadius = 143, decay = 0.016 } = {}){
+  if (!stage || !canvas) return;
   if (reduced) { canvas.remove(); return; }
   const base = stage.querySelector('img');
   const ctx = canvas.getContext('2d');
+  if (!base || !ctx) return;
   const dpr = Math.min(window.devicePixelRatio || 1, 2);
   const mk = () => { const c = document.createElement('canvas'); return [c, c.getContext('2d')]; };
   const [bwC, bwX] = mk(), [colC, colX] = mk(), [mask, mX] = mk(), [tmp, tX] = mk();
@@ -1961,8 +2033,10 @@ const toggleMode = () => setMode(getMode() === 'dark' ? 'light' : 'dark');
    clicks the switch (toggles the mode) the way a ceiling pull-cord does; letting go
    lets the spring snap the cord back up and the rope settles under gravity. */
 (function pullCord(){
-  const wrap = $('#cord'), cv = $('.cord__cv', wrap), hit = $('#cordHit');
+  const wrap = $('#cord'), cv = wrap ? $('.cord__cv', wrap) : null, hit = $('#cordHit');
+  if (!wrap || !cv || !hit) return;
   const ctx = cv.getContext('2d');
+  if (!ctx) return;
   const N = 26;                         // segments
   const G = 4600;                       // gravity, px/s² (tuned so a ~30 cm cord swings at a lifelike ~1.2 s period)
   const STEP = 1 / 120;                 // fixed physics step
@@ -2321,7 +2395,9 @@ const toggleMode = () => setMode(getMode() === 'dark' ? 'light' : 'dark');
   const ROUTES = ['web-developer/', 'app-developer/', 'ui-ux-designer/', 'graphic-designer/', 'photographer/'];
   const SLUGS = ['web-developer', 'app-developer', 'ui-ux-designer', 'graphic-designer', 'photographer'];
   // a link like …#photographer lands at the doors and walks straight through that one
-  const HASH_DOOR = SLUGS.indexOf(decodeURIComponent(location.hash.slice(1)));
+  let hashSlug = '';
+  try { hashSlug = decodeURIComponent(location.hash.slice(1)); } catch (e) {}
+  const HASH_DOOR = SLUGS.indexOf(hashSlug);
   if (HASH_DOOR >= 0){
     try { history.replaceState(null, '', location.pathname + location.search + '#works'); } catch (e) {}
     addEventListener('intro:ready', () => { warm(HASH_DOOR); setTimeout(() => window.openDoor(HASH_DOOR), 650); }, { once: true });
@@ -2392,10 +2468,14 @@ const toggleMode = () => setMode(getMode() === 'dark' ? 'light' : 'dark');
   }
   const pick = i => { cur = i; frame = frames[i]; frameReady = !!ready[i]; frames.forEach((f, k) => f && f.classList.toggle('cur', k === i)); };
   const toWall = msg => { try { frame?.contentWindow?.postMessage(msg, location.origin === 'null' ? '*' : location.origin); } catch (e) {} };
-  // start fetching the wall once the doors are near, so a click never waits
+  // start fetching the wall once the doors are near (after intro finishes so preloader animation stays uncontended)
   if ('IntersectionObserver' in window){
-    const near = new IntersectionObserver(es => { if (es.some(e => e.isIntersecting)){ near.disconnect(); setTimeout(() => { warm(4); setTimeout(() => [0, 1, 2, 3].forEach(warm), 1500); }, 600); } }, { rootMargin: '200px' });
-    near.observe(sec);
+    const startWarm = () => {
+      const near = new IntersectionObserver(es => { if (es.some(e => e.isIntersecting)){ near.disconnect(); setTimeout(() => { warm(4); setTimeout(() => [0, 1, 2].forEach(warm), 1500); }, 600); } }, { rootMargin: '200px' });
+      near.observe(sec);
+    };
+    if (window.__introDone || document.body.classList.contains('ready')) startWarm();
+    else addEventListener('intro:ready', startWarm, { once: true });
   }
 
   // hovering the doors: promote them to a GPU layer and pre-render them at the zoom the walk-through will use,
@@ -2601,7 +2681,7 @@ const toggleMode = () => setMode(getMode() === 'dark' ? 'light' : 'dark');
   const dark = $('#passage'), shade = $('#shade');
   // freezes scrolling without touching layout (a layout change here is what caused a stall)
   const swallow = e => e.preventDefault();
-  const keysStop = e => { if (['ArrowDown','ArrowUp','PageDown','PageUp',' ','Home','End'].includes(e.key) && !inWall) e.preventDefault(); };
+  const keysStop = e => { if (!e.ctrlKey && !e.metaKey && !e.altKey && ['ArrowDown','ArrowUp','PageDown','PageUp',' ','Home','End'].includes(e.key) && !inWall) e.preventDefault(); };
   function holdScroll(on){
     if (on){ lenis?.stop(); addEventListener('wheel', swallow, { passive: false }); addEventListener('touchmove', swallow, { passive: false }); addEventListener('keydown', keysStop); }
     else { lenis?.start(); removeEventListener('wheel', swallow); removeEventListener('touchmove', swallow); removeEventListener('keydown', keysStop); }
@@ -2739,90 +2819,87 @@ const toggleMode = () => setMode(getMode() === 'dark' ? 'light' : 'dark');
 
 /* ---------- PageLoader: the doors' colours stack up as the page loads, then slides apart to open it ---------- */
 const loader = $('#loader');
+const dispatchIntroReady = () => {
+  if (window.__introDispatched) return;
+  window.__introDispatched = true;
+  dispatchEvent(new Event('intro:ready'));
+};
 // back from a door's page (#works): skip the intro and stand in front of the doors again
 // (#about and #contact come from the links in a room's navbar and footer)
 if (['#works', '#about', '#contact'].includes(location.hash)) {
-  // If we land directly on a content page, skip the intro entirely.
-  loader.remove();
+  window.__introOut = true;
+  window.__introDone = true;
+  try { loader?.remove(); } catch (_) {}
   document.body.classList.add('ready');
   const wantContact = location.hash === '#contact';
   requestAnimationFrame(() => {
     if (wantContact) setTimeout(() => openModal(), 400);
     const el = $(location.hash === '#about' ? '#about' : '#works');
     if (el) window.scrollTo(0, el.getBoundingClientRect().top + pageYOffset);
-    dispatchEvent(new Event('intro:ready'));
+    dispatchIntroReady();
   });
 } else {
-  // ---------- Normal intro flow with robust safety net ----------
+  // ---------- Normal intro flow coordinated with the independent 2.5s fail-safe ----------
   stopScroll();
-  // Guarantee the page becomes usable after MAX_TIMEOUT even if JavaScript fails.
-  const MAX_TIMEOUT = 2500; // 2.5 seconds
-  const safeBail = () => {
-    // Remove loader (if present) and reveal the page.
-    try { loader.remove(); } catch (_) {}
-    document.body.classList.add('ready');
-    startScroll();
-    dispatchEvent(new Event('intro:ready'));
-  };
-  const safeTimer = setTimeout(safeBail, MAX_TIMEOUT);
-
-  let introDone = false;
   const bailOut = () => {
-    if (introDone) return;
-    introDone = true;
-    clearTimeout(safeTimer);
-    safeBail();
+    if (window.__introDone) return;
+    window.__introDone = true;
+    window.__introOut = true;
+    try { loader?.remove(); } catch (_) {}
+    document.body.classList.add('ready');
+    window.__introUnlock ? window.__introUnlock() : startScroll();
+    dispatchIntroReady();
   };
   window.__introBail = bailOut;
-  // Original 2.5 s fallback (kept for compatibility)
-  setTimeout(bailOut, 2500);
 
   try {
     const num = $('#ldCount');
     const pills = loader ? [...loader.querySelectorAll('.ld__pill')] : [];
-    // Guard against missing elements – if any are undefined we abort the animation
-    // but still let the safe timer handle the final reveal.
-    if (!num || pills.length === 0) { bailOut(); throw new Error('Missing loader elements'); }
-
-    const ease = t => t < .5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
-    const paint = p => {
-      loader.style.setProperty('--p', p.toFixed(3));
-      pills.forEach((el, k) => el.classList.toggle('on', p >= k / 6 + .02 || p >= 1));
-    };
-    const DURATION = 1100; // keep original animation length
-    let t0 = null;
-    function loadTick(now) {
-      if (t0 === null) t0 = now;
-      const elapsed = now - t0;
-      const p = Math.min(1, elapsed / DURATION);
-      const eased = ease(p);
-      paint(eased);
-      num.textContent = String(Math.round(eased * 100)).padStart(3, '0');
-      if (p < 1) {
-        requestAnimationFrame(t => { try { loadTick(t); } catch (_) { bailOut(); } });
-      } else {
-        // Normal completion – clear the independent timer.
-        clearTimeout(safeTimer);
+    if (!loader || !num || pills.length === 0) {
+      bailOut();
+    } else {
+      const ease = t => t < .5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+      const paint = p => {
+        loader.style.setProperty('--p', p.toFixed(3));
+        pills.forEach((el, k) => el.classList.toggle('on', p >= k / 6 + .02 || p >= 1));
+      };
+      const DURATION = 1000;
+      let t0 = null;
+      function finish() {
+        if (window.__introDone || window.__introOut) return;
+        window.__introOut = true;
+        try {
+          loader.style.pointerEvents = 'none';
+          loader.classList.add('out');
+        } catch (_) {}
+        setTimeout(() => document.body.classList.add('ready'), 200);
+        setTimeout(bailOut, 900);
+      }
+      function loadTick(now) {
+        if (window.__introDone || window.__introOut) return;
+        if (t0 === null) t0 = now;
+        const elapsed = Math.max(0, now - t0);
+        const p = Math.min(1, elapsed / DURATION);
+        const eased = ease(p);
+        paint(eased);
+        num.textContent = String(Math.round(eased * 100)).padStart(3, '0');
+        if (p < 1) {
+          requestAnimationFrame(t => { try { loadTick(t); } catch (_) { finish(); } });
+        } else {
+          num.textContent = '100';
+          paint(1);
+          setTimeout(finish, 120);
+        }
+      }
+      if (reduced) {
         num.textContent = '100';
         paint(1);
-        setTimeout(finish, 250);
+        setTimeout(finish, 150);
+      } else {
+        requestAnimationFrame(t => { try { loadTick(t); } catch (_) { finish(); } });
       }
     }
-    function finish() {
-      loader.classList.add('out'); // slide colours away
-      setTimeout(() => document.body.classList.add('ready'), 200);
-      setTimeout(bailOut, 750); // extra safety after animation
-    }
-    if (reduced) {
-      // Reduced‑motion fallback – instantly show 100 %
-      num.textContent = '100';
-      paint(1);
-      setTimeout(finish, 200);
-    } else {
-      requestAnimationFrame(t => { try { loadTick(t); } catch (_) { bailOut(); } });
-    }
   } catch (e) {
-    // Any unexpected error falls back to the safe bail‑out.
     bailOut();
   }
 }
@@ -3111,6 +3188,7 @@ try {
   const ID = '', K = 'tanmay-analytics';
   let v = null; try { v = localStorage.getItem(K); } catch (e) {}
   const load = () => {
+    if (!ID) return;
     window.dataLayer = window.dataLayer || [];
     window.gtag = function(){ dataLayer.push(arguments); };
     gtag('js', new Date()); gtag('config', ID);

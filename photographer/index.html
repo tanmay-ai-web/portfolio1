@@ -161,6 +161,11 @@ html[data-mode="dark"] .skel::after{background-image:linear-gradient(100deg,#231
   /* photos run in rows of the same orientation, each row its own endless strip, so the gaps
      between neighbours are the same everywhere; sizes are the same as before */
   function buildRows(){
+    if (!N){
+      ROWS = []; PH = vh || 1; PW = vw || 1; patch = [];
+      window.__rows = ROWS;
+      return;
+    }
     const mobile = vw < 640;
     const side = (mobile ? vw * .56 : Math.min(380, vh * .44)) * .93;   // same apparent size as before (the depth scale is gone)
     const A = side * side, minLen = vw * (mobile ? 2 : 1.7);            // rows long enough that no photo shows twice at once
@@ -210,7 +215,9 @@ html[data-mode="dark"] .skel::after{background-image:linear-gradient(100deg,#231
       ROWS.push({ y, H, L: x, off: ((ri * 0.381966) % 1) * x, cells });
       y += H + g;
     });
-    PH = y; PW = Math.max(...ROWS.map(r => r.L)); patch = [];
+    PH = y || vh || 1;
+    PW = ROWS.length ? Math.max(...ROWS.map(r => r.L)) : (vw || 1);
+    patch = [];
     window.__rows = ROWS;
   }
   function build(){
@@ -318,14 +325,19 @@ html[data-mode="dark"] .skel::after{background-image:linear-gradient(100deg,#231
     return el;
   }
   function render(){
+    if (!N || !(PH > 0) || !(PW > 0)) return;
     const seen = new Set();
     if (ROWS){
+      if (!ROWS.length) return;
       const iy0 = Math.floor((camY - 400) / PH), iy1 = Math.floor((camY + vh) / PH);
+      if (!Number.isFinite(iy0) || !Number.isFinite(iy1)) return;
       for (let iy = iy0; iy <= iy1; iy++) ROWS.forEach((row, ri) => {
+        if (!(row.L > 0)) return;
         const ry = row.y + iy * PH - camY;
         if (ry + row.H < -40 || ry > vh + 40) return;
         const base = camX + row.off;
         const ix0 = Math.floor((base - 400) / row.L), ix1 = Math.floor((base + vw) / row.L);
+        if (!Number.isFinite(ix0) || !Number.isFinite(ix1)) return;
         for (let ix = ix0; ix <= ix1; ix++) row.cells.forEach((c, k) => {
           const x = c.x + ix * row.L - base, y = ry + c.y;
           if (x + c.w < -40 || x > vw + 40) return;
@@ -343,6 +355,7 @@ html[data-mode="dark"] .skel::after{background-image:linear-gradient(100deg,#231
     }
     const ix0 = Math.floor((camX - 400) / PW), ix1 = Math.floor((camX + vw) / PW);
     const iy0 = Math.floor((camY - 400) / PH), iy1 = Math.floor((camY + vh) / PH);
+    if (!Number.isFinite(ix0) || !Number.isFinite(ix1) || !Number.isFinite(iy0) || !Number.isFinite(iy1)) return;
     for (let ix = ix0; ix <= ix1; ix++) for (let iy = iy0; iy <= iy1; iy++){
       for (let k = 0; k < patch.length; k++){
         const c = patch[k];
@@ -476,6 +489,7 @@ html[data-mode="dark"] .skel::after{background-image:linear-gradient(100deg,#231
   const lb = document.getElementById('lb'), lbImg = document.getElementById('lbImg');
   let cur = 0;
   function show(i){
+    if (!N) return;
     cur = mod(i, N); const p = P[cur];
     lbImg.src = p.t;                                       // instant (cached thumbnail) ...
     const full = new Image(); full.decoding = 'async'; full.src = p.f;
@@ -484,7 +498,7 @@ html[data-mode="dark"] .skel::after{background-image:linear-gradient(100deg,#231
     document.getElementById('lbCount').textContent = `${cur + 1} / ${N}`;
     new Image().src = P[mod(cur + 1, N)].f;                // warm the next one
   }
-  function openLb(i){ show(i); lb.hidden = false; requestAnimationFrame(() => lb.classList.add('open')); document.getElementById('lbClose').focus(); }
+  function openLb(i){ if (!N) return; show(i); lb.hidden = false; requestAnimationFrame(() => lb.classList.add('open')); document.getElementById('lbClose').focus(); }
   function closeLb(){ lb.classList.remove('open'); setTimeout(() => { lb.hidden = true; wall.focus(); }, 300); }
   const step = d => show(cur + d);
   document.getElementById('lbClose').onclick = closeLb;
