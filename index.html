@@ -2741,7 +2741,8 @@ const toggleMode = () => setMode(getMode() === 'dark' ? 'light' : 'dark');
 const loader = $('#loader');
 // back from a door's page (#works): skip the intro and stand in front of the doors again
 // (#about and #contact come from the links in a room's navbar and footer)
-if (['#works', '#about', '#contact'].includes(location.hash)){
+if (['#works', '#about', '#contact'].includes(location.hash)) {
+  // If we land directly on a content page, skip the intro entirely.
   loader.remove();
   document.body.classList.add('ready');
   const wantContact = location.hash === '#contact';
@@ -2752,46 +2753,78 @@ if (['#works', '#about', '#contact'].includes(location.hash)){
     dispatchEvent(new Event('intro:ready'));
   });
 } else {
+  // ---------- Normal intro flow with robust safety net ----------
   stopScroll();
-  // whatever happens in the intro, the site always opens: any error, or an intro that hasn't finished in 9 s, lets you straight in
+  // Guarantee the page becomes usable after MAX_TIMEOUT even if JavaScript fails.
+  const MAX_TIMEOUT = 2500; // 2.5 seconds
+  const safeBail = () => {
+    // Remove loader (if present) and reveal the page.
+    try { loader.remove(); } catch (_) {}
+    document.body.classList.add('ready');
+    startScroll();
+    dispatchEvent(new Event('intro:ready'));
+  };
+  const safeTimer = setTimeout(safeBail, MAX_TIMEOUT);
+
   let introDone = false;
   const bailOut = () => {
-    if (introDone) return; introDone = true;
-    try { loader.remove(); } catch (e) {}
-    document.body.classList.add('ready'); startScroll(); dispatchEvent(new Event('intro:ready'));
+    if (introDone) return;
+    introDone = true;
+    clearTimeout(safeTimer);
+    safeBail();
   };
   window.__introBail = bailOut;
+  // Original 2.5 s fallback (kept for compatibility)
   setTimeout(bailOut, 2500);
+
   try {
-  const num = $('#ldCount'), pills = [...loader.querySelectorAll('.ld__pill')];
-  const ease = t => t < .5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
-  // one colour joins the stack for each sixth of the way
-  const paint = p => { loader.style.setProperty('--p', p.toFixed(3)); pills.forEach((el, k) => el.classList.toggle('on', p >= k / 6 + .02 || p >= 1)); };
-  const DURATION = 1100;
-  let t0 = null;
-  function loadTick(now){
-    if (t0 === null) t0 = now;
-    const elapsed = now - t0;
-    const p = Math.min(1, elapsed / DURATION);
-    const eased = ease(p);
-    paint(eased);
-    num.textContent = String(Math.round(eased * 100)).padStart(3, '0');
-    if (p < 1){
-      requestAnimationFrame(t => { try { loadTick(t); } catch (e) { bailOut(); } });
-    } else {
+    const num = $('#ldCount');
+    const pills = loader ? [...loader.querySelectorAll('.ld__pill')] : [];
+    // Guard against missing elements – if any are undefined we abort the animation
+    // but still let the safe timer handle the final reveal.
+    if (!num || pills.length === 0) { bailOut(); throw new Error('Missing loader elements'); }
+
+    const ease = t => t < .5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+    const paint = p => {
+      loader.style.setProperty('--p', p.toFixed(3));
+      pills.forEach((el, k) => el.classList.toggle('on', p >= k / 6 + .02 || p >= 1));
+    };
+    const DURATION = 1100; // keep original animation length
+    let t0 = null;
+    function loadTick(now) {
+      if (t0 === null) t0 = now;
+      const elapsed = now - t0;
+      const p = Math.min(1, elapsed / DURATION);
+      const eased = ease(p);
+      paint(eased);
+      num.textContent = String(Math.round(eased * 100)).padStart(3, '0');
+      if (p < 1) {
+        requestAnimationFrame(t => { try { loadTick(t); } catch (_) { bailOut(); } });
+      } else {
+        // Normal completion – clear the independent timer.
+        clearTimeout(safeTimer);
+        num.textContent = '100';
+        paint(1);
+        setTimeout(finish, 250);
+      }
+    }
+    function finish() {
+      loader.classList.add('out'); // slide colours away
+      setTimeout(() => document.body.classList.add('ready'), 200);
+      setTimeout(bailOut, 750); // extra safety after animation
+    }
+    if (reduced) {
+      // Reduced‑motion fallback – instantly show 100 %
       num.textContent = '100';
       paint(1);
-      setTimeout(finish, 250);
+      setTimeout(finish, 200);
+    } else {
+      requestAnimationFrame(t => { try { loadTick(t); } catch (_) { bailOut(); } });
     }
+  } catch (e) {
+    // Any unexpected error falls back to the safe bail‑out.
+    bailOut();
   }
-  function finish(){
-    loader.classList.add('out');                             // the colours slide away and the curtain lifts
-    setTimeout(() => document.body.classList.add('ready'), 200);   // the hero plays its entrance as it is uncovered
-    setTimeout(bailOut, 750);
-  }
-  if (reduced){ num.textContent = '100'; paint(1); setTimeout(finish, 200); }
-  else requestAnimationFrame(t => { try { loadTick(t); } catch (e) { bailOut(); } });
-  } catch (e) { bailOut(); }
 }
 
 /* ---------- Clean routes: the address bar reads /home, /work or /my-story as you move through the page ---------- */
