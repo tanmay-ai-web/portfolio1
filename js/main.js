@@ -1365,34 +1365,35 @@ if (['#works', '#about', '#contact'].includes(location.hash)){
     document.body.classList.add('ready'); startScroll(); dispatchEvent(new Event('intro:ready'));
   };
   window.__introBail = bailOut;
-  setTimeout(bailOut, 9000);
+  setTimeout(bailOut, 2500);
   try {
   const num = $('#ldCount'), pills = [...loader.querySelectorAll('.ld__pill')];
   const ease = t => t < .5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
-  // real progress: fonts first, then the page's images; the counter never runs ahead of what has actually loaded
-  let ready = .55;
-  document.fonts?.ready.then(() => { ready = Math.max(ready, .85); });
-  const loaded = () => { ready = 1; };
-  if (document.readyState === 'complete') loaded(); else addEventListener('load', loaded, { once: true });
-  setTimeout(loaded, 5000);                               // never keep anyone waiting long
   // one colour joins the stack for each sixth of the way
   const paint = p => { loader.style.setProperty('--p', p.toFixed(3)); pills.forEach((el, k) => el.classList.toggle('on', p >= k / 6 + .02 || p >= 1)); };
-  const FILL = 1600;
-  let t0 = null, shown = 0;
+  const DURATION = 1100;
+  let t0 = null;
   function loadTick(now){
     if (t0 === null) t0 = now;
-    const want = Math.min(ease(Math.min(1, (now - t0) / FILL)), ready);
-    shown += (want - shown) * .18; if (want - shown < .002) shown = want;
-    paint(shown);
-    num.textContent = String(Math.round(shown * 100)).padStart(3, '0');
-    if (shown < 1) requestAnimationFrame(t => { try { loadTick(t); } catch (e) { bailOut(); } }); else setTimeout(finish, 520);   // the last colour lands, then it opens
+    const elapsed = now - t0;
+    const p = Math.min(1, elapsed / DURATION);
+    const eased = ease(p);
+    paint(eased);
+    num.textContent = String(Math.round(eased * 100)).padStart(3, '0');
+    if (p < 1){
+      requestAnimationFrame(t => { try { loadTick(t); } catch (e) { bailOut(); } });
+    } else {
+      num.textContent = '100';
+      paint(1);
+      setTimeout(finish, 250);
+    }
   }
   function finish(){
     loader.classList.add('out');                             // the colours slide away and the curtain lifts
-    setTimeout(() => document.body.classList.add('ready'), 260);   // the hero plays its entrance as it is uncovered
-    setTimeout(bailOut, 1250);
+    setTimeout(() => document.body.classList.add('ready'), 200);   // the hero plays its entrance as it is uncovered
+    setTimeout(bailOut, 750);
   }
-  if (reduced){ num.textContent = '100'; paint(1); setTimeout(finish, 500); }
+  if (reduced){ num.textContent = '100'; paint(1); setTimeout(finish, 200); }
   else requestAnimationFrame(t => { try { loadTick(t); } catch (e) { bailOut(); } });
   } catch (e) { bailOut(); }
 }
